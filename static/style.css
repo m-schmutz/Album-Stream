@@ -1,0 +1,300 @@
+/* GLOBAL ------------------------------------------------------------ */
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0d0d0d; /* deep cinematic black */
+    color: #e6e6e6;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #111;
+    color: #f2f2f2;
+    padding: 18px;
+    text-align: center;
+    font-size: 26px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #222;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 25px auto;
+}
+
+/* LINKS ------------------------------------------------------------- */
+
+a {
+    color: #66aaff;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #99c6ff;
+}
+
+/* TOP BAR ----------------------------------------------------------- */
+
+.top-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.top-bar a {
+    font-weight: bold;
+    padding: 6px 12px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.top-bar a:hover {
+    background: #222;
+}
+
+/* ALBUM GRID -------------------------------------------------------- */
+
+.album-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.album-card {
+    width: 200px;
+    background: #1a1a1a;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    transition: 0.2s;
+    border: 1px solid #222;
+}
+
+.album-card:hover {
+    transform: scale(1.03);
+    background: #222;
+}
+
+.album-cover {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.album-placeholder {
+    width: 100%;
+    height: 150px;
+    border-radius: 6px;
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+}
+
+/* BACK LINK --------------------------------------------------------- */
+
+.back-link {
+    margin-bottom: 15px;
+}
+
+.back-link a {
+    color: #66aaff;
+}
+
+.back-link a:hover {
+    color: #99c6ff;
+}
+
+/* VIDEO COLUMN ------------------------------------------------------ */
+
+.video-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+.video-item {
+    padding: 10px;
+    border-radius: 8px;
+    background: #1a1a1a;
+    border: 1px solid #222;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.video-item:hover {
+    background: #222;
+    transform: scale(1.01);
+}
+
+.video-thumb,
+.inline-video {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    background: black;
+}
+
+/* VIDEO ACTIONS ----------------------------------------------------- */
+
+.video-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.video-actions a {
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #333;
+    color: #eee;
+    border: 1px solid #444;
+    font-size: 12px;
+}
+
+.video-actions a:hover {
+    background: #444;
+}
+
+/* UPLOAD PAGE ------------------------------------------------------- */
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #222;
+}
+
+.upload-form label {
+    margin-bottom: 5px;
+}
+
+.upload-form input[type="text"],
+.upload-form select,
+.upload-form input[type="file"] {
+    width: 100%;
+    background: #111;
+    color: #eee;
+    border: 1px solid #333;
+    padding: 6px;
+    border-radius: 4px;
+}
+
+.upload-form button {
+    padding: 10px 14px;
+    border-radius: 4px;
+    border: none;
+    background: #444;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.upload-form button:hover {
+    background: #555;
+}
+
+/* WHEEL PAGE -------------------------------------------------------- */
+
+.wheel-container {
+    text-align: center;
+}
+
+.wheel-wrapper {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 25px auto;
+}
+
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 6px solid #444;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    background: conic-gradient(
+        #4caf50 0deg 45deg,   /* WIN */
+        #b71c1c 45deg 90deg,  /* LOSE */
+        #e65100 90deg 135deg, /* LOSE */
+        #b71c1c 135deg 180deg,
+        #e65100 180deg 225deg,
+        #b71c1c 225deg 270deg,
+        #e65100 270deg 315deg,
+        #b71c1c 315deg 360deg
+    );
+    transform: rotate(-22.5deg); /* align WIN slice with pointer */
+}
+
+.pointer {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 24px solid #ffeb3b; /* gold pointer */
+    filter: drop-shadow(0 0 4px #ffeb3b);
+    z-index: 2;
+}
+
+.spin-button {
+    padding: 12px 18px;
+    border-radius: 4px;
+    border: none;
+    background: #444;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.spin-button:hover:not(:disabled) {
+    background: #555;
+}
+
+.spin-button:disabled {
+    opacity: 0.5;
+}
+
+.wheel-message {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #ffeb3b;
+}
+
+/* SECRET VIDEO PAGE ------------------------------------------------- */
+
+.secret-container {
+    text-align: center;
+}
+
+.secret-video-player {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 8px;
+    background: black;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.secret-note {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #aaa;
+}

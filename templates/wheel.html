@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Spin for Uncensored Version</title>
+</head>
+<body>
+
+<header>Spin for Uncensored Version</header>
+
+<div class="container wheel-container">
+    <div class="back-link">
+        <a href="{{ url_for('album_page', album=album) }}">← Back to album</a>
+    </div>
+
+    <p>You are spinning for the uncensored version of:</p>
+    <p><strong>{{ video }}</strong> in album <strong>{{ album }}</strong></p>
+
+    <div class="wheel-wrapper">
+        <div class="pointer"></div>
+        <div id="wheel" class="wheel"></div>
+    </div>
+
+    <button id="spin-btn" class="spin-button">Spin the Wheel</button>
+
+    <div id="wheel-message" class="wheel-message"></div>
+</div>
+
+<script>
+const spinBtn = document.getElementById("spin-btn");
+const wheel = document.getElementById("wheel");
+const messageEl = document.getElementById("wheel-message");
+
+let currentRotation = 0;
+let spinning = false;
+
+spinBtn.addEventListener("click", async () => {
+    if (spinning) return;
+    spinning = true;
+    messageEl.textContent = "";
+    spinBtn.disabled = true;
+
+    // Call server to determine win/lose
+    const res = await fetch("{{ url_for('spin', album=album, video=video) }}", {
+        method: "POST"
+    });
+
+    const data = await res.json();
+
+    if (!data.allowed) {
+        spinning = false;
+        spinBtn.disabled = false;
+        if (data.reason === "already_spun") {
+            messageEl.textContent = "You already spun today. Come back tomorrow!";
+        } else {
+            messageEl.textContent = "You cannot spin right now.";
+        }
+        return;
+    }
+
+    const win = data.win;
+    const secretUrl = data.secret_url || null;
+
+    // Wheel animation parameters
+    const sliceCount = 8;
+    const sliceAngle = 360 / sliceCount;
+    const fullRotations = 5 * 360; // 5 full spins
+
+    // Index 0 is the WIN slice (green), others are LOSE (red/orange)
+    const winIndex = 0;
+    const loseIndices = [1, 2, 3, 4, 5, 6, 7];
+
+    let targetIndex;
+    if (win) {
+        targetIndex = winIndex;
+    } else {
+        targetIndex = loseIndices[Math.floor(Math.random() * loseIndices.length)];
+    }
+
+    // Random offset within the slice so it doesn't look robotic
+    const offsetWithinSlice = (Math.random() - 0.5) * (sliceAngle * 0.6);
+
+    const targetRotation =
+        currentRotation +
+        fullRotations +
+        targetIndex * sliceAngle +
+        offsetWithinSlice;
+
+    wheel.style.transition = "transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)";
+    wheel.style.transform = `rotate(${targetRotation}deg)`;
+
+    const handleTransitionEnd = () => {
+        wheel.removeEventListener("transitionend", handleTransitionEnd);
+        currentRotation = targetRotation % 360;
+        spinning = false;
+        spinBtn.disabled = false;
+
+        if (win && secretUrl) {
+            messageEl.textContent = "You won! Redirecting to your uncensored video...";
+            setTimeout(() => {
+                window.location.href = secretUrl;
+            }, 1200);
+        } else if (win) {
+            messageEl.textContent = "You won, but no uncensored URL was provided.";
+        } else {
+            messageEl.textContent = "No luck this time. Try again tomorrow!";
+        }
+    };
+
+    wheel.addEventListener("transitionend", handleTransitionEnd);
+});
+</script>
+
+</body>
+</html>

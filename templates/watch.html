@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <title>{{ video }}</title>
+</head>
+<body>
+
+<header>{{ album }} — {{ video }}</header>
+
+<div class="container video-page">
+    <video controls class="video-player">
+        <source src="/video/{{ album }}/{{ video }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="back-link">
+        <a href="/album/{{ album }}">← Back to album</a>
+    </div>
+</div>
+
+</body>
+</html>

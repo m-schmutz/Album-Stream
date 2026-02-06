@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>{{ album }}</title>
+</head>
+<body>
+
+<header>{{ album }}</header>
+
+<div class="container">
+    <div class="back-link">
+        <a href="{{ url_for('index') }}">← Back to albums</a>
+    </div>
+
+    <div class="video-column">
+        {% for video in videos %}
+            <div class="video-item" data-album="{{ album }}" data-video="{{ video }}">
+                <img src="{{ url_for('thumbnail', album=album, filename=video) }}" class="video-thumb">
+                <div class="video-actions">
+                    <a class="secret-link" href="{{ url_for('wheel', album=album, video=video) }}">
+                        Spin for Uncensored Version
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function replaceWithVideo(container, srcUrl) {
+    container.innerHTML = `
+        <video controls autoplay class="inline-video">
+            <source src="${srcUrl}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    `;
+}
+
+document.addEventListener("click", (e) => {
+    const item = e.target.closest(".video-item");
+    if (!item) return;
+
+    // If the user clicked the secret link, do nothing
+    if (e.target.closest(".secret-link")) return;
+
+    const album = item.dataset.album;
+    const video = item.dataset.video;
+
+    const srcUrl = "{{ url_for('stream_video', album='__ALBUM__', filename='__VIDEO__') }}"
+        .replace("__ALBUM__", encodeURIComponent(album))
+        .replace("__VIDEO__", encodeURIComponent(video));
+
+    replaceWithVideo(item, srcUrl);
+});
+</script>
+
+</body>
+</html>

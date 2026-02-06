@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Upload</title>
+</head>
+<body>
+
+<header>Upload Video</header>
+
+<div class="container">
+    <div class="back-link">
+        <a href="{{ url_for('index') }}">← Back to albums</a>
+    </div>
+
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="upload-form">
+        <div class="upload-mode">
+            <label>
+                <input type="radio" name="mode" value="existing" checked>
+                Add to existing album
+            </label>
+            <label>
+                <input type="radio" name="mode" value="new">
+                Create new album
+            </label>
+        </div>
+
+        <div class="existing-album-section">
+            <label for="existing_album">Existing album:</label>
+            <select name="existing_album" id="existing_album">
+                {% for album in albums %}
+                    <option value="{{ album }}">{{ album }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="new-album-section" style="display:none;">
+            <label for="new_album_name">New album name:</label>
+            <input type="text" name="new_album_name" id="new_album_name">
+
+            <label for="cover">Cover image:</label>
+            <input type="file" name="cover" id="cover" accept="image/*">
+        </div>
+
+        <div class="video-upload-section">
+            <label for="video_normal">Normal video file:</label>
+            <input type="file" name="video_normal" id="video_normal" accept="video/*" required>
+
+            <label for="video_secret">Secret video file:</label>
+            <input type="file" name="video_secret" id="video_secret" accept="video/*" required>
+        </div>
+
+        <button type="submit">Upload</button>
+    </form>
+</div>
+
+<script>
+const modeRadios = document.querySelectorAll('input[name="mode"]');
+const existingSection = document.querySelector('.existing-album-section');
+const newSection = document.querySelector('.new-album-section');
+
+modeRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+        if (radio.value === 'existing') {
+            existingSection.style.display = 'block';
+            newSection.style.display = 'none';
+        } else {
+            existingSection.style.display = 'none';
+            newSection.style.display = 'block';
+        }
+    });
+});
+</script>
+
+</body>
+</html>

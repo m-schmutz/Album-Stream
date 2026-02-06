@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Albums</title>
+</head>
+<body>
+
+<header>Video Albums</header>
+
+<div class="container">
+    <div class="top-bar">
+        <a href="{{ url_for('upload') }}">Upload</a>
+    </div>
+
+    <div class="album-grid">
+        {% for album in albums %}
+            <div class="album-card">
+                <a href="{{ url_for('album_page', album=album.name) }}">
+                    {% if album.cover %}
+                        <img src="{{ album.cover }}" class="album-cover">
+                    {% else %}
+                        <div class="album-placeholder">No Cover</div>
+                    {% endif %}
+                    <h3>{{ album.name }}</h3>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
