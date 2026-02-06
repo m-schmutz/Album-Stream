@@ -30,6 +30,10 @@
 
 <script>
 function replaceWithVideo(container, srcUrl) {
+    // Preserve height to prevent scroll jump
+    const height = container.offsetHeight;
+    container.style.height = height + "px";
+
     container.innerHTML = `
         <video controls autoplay class="inline-video">
             <source src="${srcUrl}" type="video/mp4">
