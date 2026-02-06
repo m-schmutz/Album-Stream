@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Spin{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Spin the Wheel</h2>
+
+{% if not allowed %}
+  <p>You must wait before spinning again.</p>
+  <p>Time remaining:
+    <span id="spin-countdown" data-remaining="{{ remaining_seconds }}"></span>
+  </p>
+{% else %}
+  <p>Win chance: {{ (win_probability * 100) | round(1) }}%</p>
+
+  <div class="wheel-container">
+      <div class="wheel"></div>
+      <div class="wheel-arrow"></div>
+  </div>
+
+  <form action="{{ url_for('spin.start_spin', album_id=album_id, video_id=video_id) }}" method="post">
+    <button type="submit" class="spin-button">Spin</button>
+  </form>
+{% endif %}
+
+{% if config.DEBUG %}
+<div class="debug-controls">
+  <p>Debug shortcuts:</p>
+  <a href="{{ url_for('spin.force_win', album_id=album_id, video_id=video_id) }}">Force Win</a>
+  <a href="{{ url_for('spin.force_lose', album_id=album_id, video_id=video_id) }}">Force Lose</a>
+</div>
+{% endif %}
+
+<script>
+// Countdown timer
+(function() {
+    const el = document.getElementById('spin-countdown');
+    if (!el) return;
+
+    let remaining = parseInt(el.dataset.remaining, 10);
+
+    function format(sec) {
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    function tick() {
+      if (remaining <= 0) {
+        el.textContent = "00:00:00";
+        return;
+      }
+      el.textContent = format(remaining);
+      remaining -= 1;
+      setTimeout(tick, 1000);
+    }
+
+    tick();
+})();
+</script>
+
+{% if result in ["win", "lose"] %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const result = "{{ result }}";
+    const wheel = document.querySelector(".wheel");
+    if (!wheel) return;
+
+    const baseRotation = result === "win" ? 10 : 200;
+    const spins = 6;
+    const finalRotation = spins * 360 + baseRotation;
+
+    // Smooth casino-style ease-out
+    wheel.style.transition = "transform 3s ease-out";
+    wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+    setTimeout(async () => {
+    // Save timestamp AFTER animation
+    await fetch("/spin/{{ album_id }}/{{ video_id }}/mark_spun", { method: "POST" });
+
+    // Show overlay
+    const overlay = document.getElementById("video-overlay");
+    const video = document.getElementById("spin-video");
+    overlay.style.display = "flex";
+
+    // Load the correct video
+    video.src = "{{ url_for('albums.play_video', album_id=album_id, video_id=video_id, version='uncensored' if result == 'win' else 'pixelated') }}";
+
+    // When video ends, redirect to album page
+    video.onended = () => {
+        window.location.href = "{{ url_for('albums.view_album', album_id=album_id) }}";
+    };
+
+}, 3200);
+
+});
+</script>
+{% endif %}
+
+<div id="video-overlay" class="video-overlay" style="display:none;">
+    <div class="video-overlay-content">
+        <video id="spin-video" controls autoplay muted></video>
+    </div>
+</div>
+
+{% endblock %}
+
+<script>
+window.addEventListener("pageshow", function(event) {
+    if (event.persisted) {
+        // Page was restored from bfcache — force a reload
+        window.location.reload();
+    }
+});
+</script>
+

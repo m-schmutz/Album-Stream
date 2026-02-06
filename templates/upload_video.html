@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Upload Video{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Upload Video to Album</h2>
+<form action="{{ url_for('upload.upload_video') }}" method="post" enctype="multipart/form-data" class="form-card">
+  <label>
+    Album:
+    <select name="album_id" required>
+      <option value="">Select album</option>
+      {% for album in albums %}
+        <option value="{{ album.id }}">{{ album.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Main video (mp4):
+    <input type="file" name="main_video" accept="video/mp4" required>
+  </label>
+  <label>
+    Uncensored video (mp4):
+    <input type="file" name="uncensored_video" accept="video/mp4" required>
+  </label>
+  <label>
+    Pixelated video (mp4):
+    <input type="file" name="pixelated_video" accept="video/mp4" required>
+  </label>
+  <button type="submit">Upload</button>
+</form>
+{% endblock %}

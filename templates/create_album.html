@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Create Album{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Create New Album</h2>
+<form action="{{ url_for('upload.create_album') }}" method="post" enctype="multipart/form-data" class="form-card">
+  <label>
+    Album name:
+    <input type="text" name="name" required>
+  </label>
+  <label>
+    Cover image (4:3, jpg/png):
+    <input type="file" name="cover" accept="image/*" required>
+  </label>
+  <button type="submit">Create</button>
+</form>
+{% endblock %}
