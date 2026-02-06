@@ -22,6 +22,17 @@ from werkzeug.utils import secure_filename
 
 from fileupdate import generate_thumbnail
 
+import configparser
+
+# Load config
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+HOST = config.get("server", "host", fallback="127.0.0.1")
+PORT = config.getint("server", "port", fallback=5000)
+DEBUG = config.getboolean("server", "debug", fallback=False)
+
+
 app = Flask(__name__)
 
 BASE_ALBUM_DIR: Path = Path("albums")
@@ -275,4 +286,4 @@ def secret_stream(token: str):
 
 if __name__ == "__main__":
     ensure_dirs()
-    app.run(debug=True)
+    app.run(host=HOST, port=PORT, debug=DEBUG)
