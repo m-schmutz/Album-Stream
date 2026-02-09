@@ -1,0 +1,134 @@
+I want a flask web app that allows me to stream videos in HLS format for streaming. The videos are organized into albums and have 5 versions:
+1. Black Bar
+2. Boxes
+3. Emojis
+4. Pixels
+5. Uncensored
+The black bar version of each video is always unlocked, however 2-5 have to be unlocked by guessing a number that is within increasingly larger ranges. The user gets hints 
+after each guess if the correct number is higher or lower than their last guess. If they cannot guess the number, there is a cooldown of 1 minute before they can guess again.
+If the user guesses correctly, they are able to access all videos in the album at that version. The unlocks should be tied to the session so every new connection has to go 
+through the unlocks again. There should also be a timeout after inactivity so that the user cannot just keep the session open forever. I also want to make sure that a user cannot save a video url and view it at anytime. 
+
+I am using python 3.13 on Debian OS and have ffmpeg installed for video conversions/thumbnail generation
+
+Webpages:
+I want a home page, album page, create album page, edit album page and upload video set page.
+
+Home Page:
+- should display all albums available with the name of the album, and cover images
+- there should be a button at the top that goes to the create album page
+- There should also be a button that goes to the edit album page. 
+
+Create Album Page:
+- this page allows the user to create a new album 
+- should have a back button to the home page
+- a form that takes in the display name of the album, the folder name, and a cover image that is required to be 4:3 aspect ratio enforced by Pillow
+
+Edit Album Page:
+- this page should allow the user to change the cover image of the album
+- image is still enforced to be 4:3 aspect ratio
+
+Album Page:
+- this page displays the videos available in the album
+- should have a button to go back to the home page
+- should have a button that allows them to upload a new video set to the album
+- should tabs across the top for each of the versions (Black bar, boxes, ..etc)
+- When on a tab, it should display all videos of that version with thumbnails and the video name
+- clicking on the video should play it in place but also allow it to be put in full screen.
+- if the user clicks on a tab for a version set they have not yet unlocked
+	- you said in an earlier conversation that an inline panel works best for mobile so I want that to be used
+	- something like a locked panel with a guess form
+- the ranges of numbers that the user guesses within should be in a config file for the size of them
+- the hls videos will be stored within the project, the exact layout is shown a little later in this text
+- the HLS videos should be streamed through Proxy the HLS segments through Flask
+- black bar tab should not show any message about unlocking
+- videos should appear in a grid where just clicking on the video starts it playing
+- videos should paly in place rather than opening a separate video panel
+- user should know what the range is that they are guessing in
+- video thumbnails should be fullsize, no cropping
+- after a user unlocks a version, the thumbnails for that version should be visible wihtout needing to refresh the page
+
+
+Upload Video Set
+- this page allows the user to upload a video set to the specific album that they were on
+- takes in exactly 5 files
+	- the 5 files need to be in the format <album folder name>-<video name>-<version token>.mp4
+- the version tokens correspond to the version types as follows:
+	- Black Bar = blackbar
+	- Boxes = boxes
+	- Emojis = emojis
+	- Pixels = pixels
+	- Uncensored = uncensored
+- thumbnails should be generated from the files uploaded with a frame being taken from 1 second into the video
+- the files are uploaded as mp4 and then should be converted to HLS by the server
+- the <video name> part of the video file upload should be used to give that video a display name on the album page
+- ensure that videos are fully saved to the filesystem before performing any ffmpeg operations
+
+Albums Filesystem Layout
+- I want the albums to each have their own folder that contains all videos associated with it, something like this
+albums/
+	album1/
+		videoname/
+			blackbar/
+				thumb.jpg
+				index.m3u8
+				index0.ts
+				index1.ts
+
+- this is just for the black bar version but all other versions should reflect this layout
+- the folder for each version should be the <version token> for its name
+
+
+Number Guessing Game:
+- each version (Black bar, boxes, ..etc) should have increasingly larger number sets that is configurable
+- each version should have a configurable guessing attempts that decides how many guesses the user gets
+- the cooldown of 1 minute starts when the user has used all of their attempts
+
+
+Session Behavior
+- the server should ensure that after 10 minutes of activity, any unlocks are voided
+- session data should be stored server side
+- Using Flasks built in Flask-Session is fine for this
+
+
+Configuration:
+- should include parameters for app.run() (host, port, and debug mode)
+- config section for guessing options should have a layout like this:
+- config should also include a path used for ffmpeg
+{
+  "guessing": {
+    "boxes":    { "min": 1, "max": 25, "attempts": 5 },
+    "emojis":    { "min": 1, "max": 50, "attempts": 5 },
+    "pixels":   { "min": 1, "max": 100, "attempts": 5 },
+    "uncensored": { "min": 1, "max": 250, "attempts": 5 }
+  },
+  "cooldown_seconds": 60,
+  "session_timeout_seconds": 600
+}
+
+- black bar is not necessary as it is always unlocked
+
+
+Metadata:
+- can use a global albums.json file to store metadata like this
+{
+  "albums": [
+    {
+      "display_name": "My Album",
+      "folder_name": "my_album",
+      "cover_image": "my_album_cover.jpg"
+    }
+  ]
+}
+
+
+Notes:
+- I do not want to use a database, just the filesystem
+- Make the project a multi file flask app but no need to use __init__.py's as this is a personal project
+- configuration should be stored in a single json file
+- use hls.js to play videos
+- use vanilla css to style the pages in a clean way. I also do not want any bright/white styling. Use darker colors but in a way that still looks professional
+- HLS proxying should be done in the best way by your judgement
+- HLS conversions should only produce one version that is the highest quality possible
+- ffmpeg conversions can use default settings, as long as quality is not lost
+- include a requirements.txt for all python packages needed
